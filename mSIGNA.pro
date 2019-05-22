@@ -173,7 +173,7 @@ win32 {
     BOOST_THREAD_LIB_SUFFIX = _win32
 
     LIBS += \
-        -L/usr/x86_64-w64-mingw32/plugins/platforms \
+        -L/usr/local/x86_64-w64-mingw32/plugins/platforms \
         -static -static-libgcc -static-libstdc++ \
         -lpthread \
         -lws2_32 \
