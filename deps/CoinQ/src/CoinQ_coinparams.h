@@ -140,6 +140,9 @@ public:
 private:
     NetworkMap network_map_;
     std::string selected_;
+    const CoinParams* selectedCP = NULL;
+
+    void NetworkMap_Insert(const CoinParams& (*pGetterFunction)());
 };
 
 

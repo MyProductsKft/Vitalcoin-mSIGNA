@@ -22,30 +22,43 @@ namespace CoinQ
 
 NetworkSelector::NetworkSelector(const std::string& network_name)
 {
-    network_map_.insert(NetworkPair("bitcoin", getBitcoinParams()));
-    network_map_.insert(NetworkPair("testnet3", getTestnet3Params()));
-    network_map_.insert(NetworkPair("litecoin", getLitecoinParams()));
-    network_map_.insert(NetworkPair("ltctestnet4", getLtcTestnet4Params()));
-    network_map_.insert(NetworkPair("quarkcoin", getQuarkcoinParams()));
+    NetworkMap_Insert(getBitcoinParams    );
+    NetworkMap_Insert(getTestnet3Params   );
+    NetworkMap_Insert(getLitecoinParams   );
+    NetworkMap_Insert(getLtcTestnet4Params);
+    NetworkMap_Insert(getQuarkcoinParams  );
 
     if (!network_name.empty()) { select(network_name); }
+}
+
+void NetworkSelector::NetworkMap_Insert(const CoinParams& (*pGetterFunction)())
+{
+    if (!pGetterFunction) return;
+
+    const CoinParams& CP = pGetterFunction();
+    string Key(CP.network_name());
+
+    transform(Key.begin(), Key.end(), Key.begin(), ::tolower);
+
+    network_map_.insert(NetworkPair(Key, CP));
 }
 
 vector<string> NetworkSelector::getNetworkNames() const
 {
     vector<string> names;
-    for (const auto& item: network_map_) { names.push_back(item.first); }
+    for (const auto& item: network_map_) { names.push_back(item.second.network_name()); }
     return names;
 }
 
 const CoinParams& NetworkSelector::getCoinParams(const std::string& network_name) const
 {
-    string lower_network_name;
+    if (network_name.empty())
+    {
+        if (selectedCP) return *selectedCP;
+        throw NetworkSelectorNoNetworkSelectedException();
+    }
 
-    if (network_name.empty())   { lower_network_name = selected_;    }
-    else                        { lower_network_name = network_name; }
-
-    if (lower_network_name.empty()) throw NetworkSelectorNoNetworkSelectedException();
+    string lower_network_name(network_name);
 
     transform(lower_network_name.begin(), lower_network_name.end(), lower_network_name.begin(), ::tolower);
 
@@ -59,9 +72,11 @@ void NetworkSelector::select(const std::string& network_name)
 {
     string lower_network_name(network_name);
     transform(lower_network_name.begin(), lower_network_name.end(), lower_network_name.begin(), ::tolower);
-    if (!network_map_.count(lower_network_name)) throw NetworkSelectorNetworkNotRecognizedException(lower_network_name);
+    const auto& it = network_map_.find(lower_network_name);
+    if (it == network_map_.end()) throw NetworkSelectorNetworkNotRecognizedException(lower_network_name);
 
     selected_ = lower_network_name;
+    selectedCP = &(it->second);
 }
 
 
