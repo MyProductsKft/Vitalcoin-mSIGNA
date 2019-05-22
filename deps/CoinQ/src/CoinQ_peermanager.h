@@ -53,7 +53,10 @@ public:
         uint32_t protocol_version,
         const std::string& user_agent = std::string(),
         uint32_t start_height = 0,
-        bool relay = true
+        bool relay = true,
+        uint32_t invFlags = DEFAULT_INV_FLAGS,
+        bool forkHashExists = false,
+        const uchar_vector& forkHash = g_zero32bytes
     );
 
     bool deletePeer(const std::string& peername);

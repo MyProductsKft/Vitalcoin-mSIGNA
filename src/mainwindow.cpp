@@ -2648,7 +2648,7 @@ void MainWindow::loadSettings()
         showTrailingDecimals = settings.value("showtrailingdecimals", true).toBool();
         setTrailingDecimals(showTrailingDecimals);
         blockTreeFile = settings.value("blocktreefile", getDefaultSettings().getDataDir() + "/blocktree.dat").toString();
-        host = settings.value("host", "localhost").toString();
+        host = settings.value("host", getCoinParams().default_host()).toString();
         port = settings.value("port", getCoinParams().default_port()).toInt();
         autoConnect = settings.value("autoconnect", false).toBool();
 #ifdef SUPPORT_OLD_ADDRESS_VERSIONS

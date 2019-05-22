@@ -32,7 +32,7 @@ NetworkSync::NetworkSync(const CoinQ::CoinParams& coinParams, bool bCheckProofOf
     m_bIOServiceStarted(false),
     m_work(m_ioService),
     m_bConnected(false),
-    m_peer(m_ioService),
+    m_peer(m_ioService, "", "", 0, 0, std::string(), 0, true, DEFAULT_INV_FLAGS, coinParams.forkHashExists(), coinParams.forkHash()),
     m_bFlushingToFile(false),
     m_bHeadersSynched(false),
     m_bMissingTxs(false)
@@ -622,7 +622,7 @@ void NetworkSync::start(const std::string& host, const std::string& port)
         m_bStarted = true;
 
         std::string port_ = port.empty() ? m_coinParams.default_port() : port;
-        m_peer.set(host, port_, m_coinParams.magic_bytes(), m_coinParams.protocol_version(), "Wallet v0.1", 0, false);
+        m_peer.set(host, port_, m_coinParams.magic_bytes(), m_coinParams.protocol_version(),  m_coinParams.user_agent(), 0, false, m_coinParams.forkHashExists(), m_coinParams.forkHash());
 
         LOGGER(trace) << "Starting peer " << host << ":" << port_ << "..." << endl;
         m_peer.start();

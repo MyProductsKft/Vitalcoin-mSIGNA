@@ -25,7 +25,7 @@ void Peer::do_handshake()
     // Send version message
     Coin::NetworkAddress peerAddress;
     peerAddress.set(NODE_NETWORK, DEFAULT_Ipv6, strtoul(port_.c_str(), NULL, 0));
-    Coin::VersionMessage versionMessage(protocol_version_, NODE_NETWORK, time(NULL), peerAddress, peerAddress, getRandomNonce64(), user_agent_.c_str(), start_height_, relay_);
+    Coin::VersionMessage versionMessage(protocol_version_, NODE_NETWORK, time(NULL), peerAddress, peerAddress, getRandomNonce64(), user_agent_.c_str(), start_height_, relay_, forkHashExists_, forkHash_);
     Coin::CoinNodeMessage msg(magic_bytes_, &versionMessage);
 
     LOGGER(trace) << "Sending version message." << endl;

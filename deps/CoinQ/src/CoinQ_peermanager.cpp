@@ -20,7 +20,10 @@ void PeerManager::createPeer(
     uint32_t protocol_version,
     const std::string& user_agent,
     uint32_t start_height,
-    bool relay
+    bool relay,
+    uint32_t invFlags,
+    bool forkHashExists,
+    const uchar_vector& forkHash
 )
 {
     std::shared_ptr<Peer> peer(new Peer(io_service_,
@@ -30,7 +33,10 @@ void PeerManager::createPeer(
         protocol_version,
         user_agent,
         start_height,
-        relay));
+        relay,
+        invFlags,
+        forkHashExists,
+        forkHash));
 
     // TODO: use a separate thread with an event queue
     peer->subscribeMessage([&](Peer& peer, const Coin::CoinNodeMessage& message) { notifyMessage(peer, message); });

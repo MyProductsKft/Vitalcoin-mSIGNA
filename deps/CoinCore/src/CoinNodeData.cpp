@@ -31,6 +31,25 @@ using namespace std;
 
 uchar_vector g_zero32bytes("0000000000000000000000000000000000000000000000000000000000000000");
 
+namespace Coin
+{
+
+static struct
+{
+
+    bool         forkHashExists = false        ;
+    uchar_vector forkHash       = g_zero32bytes;
+
+} ReportedValues;
+
+void ReportForkHash(bool forkHashExists, const uchar_vector& forkHash)
+{
+    ReportedValues.forkHashExists = forkHashExists;
+    ReportedValues.forkHash       = forkHash      ;
+}
+
+} // namespace Coin
+
 // Globals
 unsigned char g_addressVersion = 0x00;
 unsigned char g_multiSigAddressVersion = 0x05;
@@ -642,7 +661,9 @@ VersionMessage::VersionMessage(
     uint64_t nonce,
     const char* subVersion,
     int32_t startHeight,
-    bool relay
+    bool relay,
+    bool forkHashExists,
+    const uchar_vector& forkHash
 ) :
     version_(version),
     services_(services),
@@ -652,14 +673,20 @@ VersionMessage::VersionMessage(
     nonce_(nonce),
     subVersion_(subVersion),
     startHeight_(startHeight),
-    relay_(relay)
+    relay_(relay),
+    forkHashExists_(forkHashExists),
+    forkHash_(forkHash)
 {
 }
 
 uint64_t VersionMessage::getSize() const
 {
     uint64_t size = subVersion_.getSize() + MIN_VERSION_MESSAGE_SIZE;
-    if (version_ >= 70001) { size++; }
+    if (version_ >= 70001)
+    {
+        size++;
+        if (forkHashExists_) size += 32;
+    }
     return size;
 }
 
@@ -673,7 +700,11 @@ uchar_vector VersionMessage::getSerialized() const
     rval += uint_to_vch(nonce_, LITTLE_ENDIAN_);
     rval += subVersion_.getSerialized();
     rval += uint_to_vch(startHeight_, LITTLE_ENDIAN_);
-    if (version_ >= 70001) { rval.push_back(relay_ ? 1 : 0); }
+    if (version_ >= 70001)
+    {
+        rval.push_back(relay_ ? 1 : 0);
+        if (forkHashExists_) rval += forkHash_.getReverse();
+    }
     return rval;
 }
 
@@ -702,10 +733,23 @@ void VersionMessage::setSerialized(const uchar_vector& bytes)
     if (bytes.size() < pos + 4)
         throw runtime_error("Invalid data - VersionMessage missing startHeight.");
     startHeight_ = vch_to_uint<uint32_t>(uchar_vector(bytes.begin() + pos, bytes.begin() + pos + 4), LITTLE_ENDIAN_);
+    pos += 4;
     if (version_ >= 70001)
     {
-        pos += 4;
         relay_ = (bytes[pos] != 0);
+        pos += 1;
+        if (bytes.size() >= (pos + 32))
+        {
+            uchar_vector subbytes(bytes.begin() + pos, bytes.begin() + pos + 32);
+            pos += 32;
+            subbytes.reverse();
+            forkHash_ = subbytes;
+            forkHashExists_ = true;
+        }
+        else
+        {
+            forkHashExists_ = false;
+        }
     }
     else
     {
@@ -723,6 +767,7 @@ string VersionMessage::toString() const
     if (version_ >= 70001)
     {
         ss << ", relay: " << (relay_ ? "true" : "false");
+        if (forkHashExists_) ss << ", forkHash: " << forkHash_.getHex();
     }
     return ss.str();
 }
@@ -741,6 +786,7 @@ string VersionMessage::toIndentedString(uint spaces) const
     if (version_ >= 70001)
     {
         ss << endl << blankSpaces(spaces) << "relay: " << (relay_ ? "true" : "false");
+        if (forkHashExists_) ss << endl << blankSpaces(spaces) << "forkHash: " << forkHash_.getHex();
     }
     return ss.str();
 }
@@ -1429,12 +1475,26 @@ uint64_t Transaction::getVSize() const
 
     return count;
 }
+
 uchar_vector Transaction::getSerialized(bool bWithWitness) const
+{
+    return getSerialized(bWithWitness, false);
+}
+
+uchar_vector Transaction::getSerialized(bool bWithWitness, bool bWithForkHash) const
 {
     bWithWitness = bWithWitness && hasWitness();
 
+    uchar_vector rval;
+
+    if (bWithForkHash && ReportedValues.forkHashExists)
+    {
+        // ForkHash
+        rval += ReportedValues.forkHash.getReverse();
+    }
+
     // version
-    uchar_vector rval = uint_to_vch(version, LITTLE_ENDIAN_);
+    rval += uint_to_vch(version, LITTLE_ENDIAN_);
 
     if (bWithWitness)
     {
@@ -1623,7 +1683,7 @@ uchar_vector Transaction::getSigHash(uint32_t hashType, uint index, const uchar_
             if (index == i) { copy.inputs[i].scriptSig = script; }
             else            { copy.inputs[i].scriptSig.clear();  }
         }
-        return sha256_2(copy.getSerialized(false) + uint_to_vch(hashType, LITTLE_ENDIAN_));
+        return sha256_2(copy.getSerialized(false, true) + uint_to_vch(hashType, LITTLE_ENDIAN_));
     }
 
     if (hashPrevouts.empty())
@@ -1651,6 +1711,7 @@ uchar_vector Transaction::getSigHash(uint32_t hashType, uint index, const uchar_
     }
 
     uchar_vector ss;
+    if (ReportedValues.forkHashExists) ss += ReportedValues.forkHash.getReverse();
     ss += uint_to_vch(version, LITTLE_ENDIAN_);
     ss += hashPrevouts;
     ss += hashSequence;

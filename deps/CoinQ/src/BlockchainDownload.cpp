@@ -26,7 +26,7 @@ BlockchainDownload::BlockchainDownload(const CoinQ::CoinParams& coinParams, bool
     m_bIOServiceStarted(false),
     m_work(m_ioService),
     m_bConnected(false),
-    m_peer(m_ioService)
+    m_peer(m_ioService, "", "", 0, 0, std::string(), 0, true, DEFAULT_INV_FLAGS, coinParams.forkHashExists(), coinParams.forkHash())
 {
     // Select hash functions
     Coin::CoinBlockHeader::setHashFunc(m_coinParams.block_header_hash_function());
@@ -163,7 +163,7 @@ void BlockchainDownload::start(const string& host, const string& port, const vec
         m_bStarted = true;
 
         string port_ = port.empty() ? m_coinParams.default_port() : port;
-        m_peer.set(host, port_, m_coinParams.magic_bytes(), m_coinParams.protocol_version(), "Wallet v0.1", 0, false);
+        m_peer.set(host, port_, m_coinParams.magic_bytes(), m_coinParams.protocol_version(),  m_coinParams.user_agent(), 0, false, m_coinParams.forkHashExists(), m_coinParams.forkHash());
 
         if (locatorHashes.empty())
         {

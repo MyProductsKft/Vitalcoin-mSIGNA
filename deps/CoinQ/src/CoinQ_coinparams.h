@@ -44,7 +44,11 @@ public:
         Coin::hashfunc_t block_header_hash_function,
         Coin::hashfunc_t block_header_pow_hash_function,
         const Coin::CoinBlockHeader& genesis_block,
-        bool segwit_enabled = false) :
+        bool segwit_enabled = false,
+        const char* default_host = "localhost",
+        const std::string& user_agent = std::string("mSIGNA Wallet v0.11.1"),
+        bool forkHashExists = false,
+        const uchar_vector& forkHash = g_zero32bytes) :
     magic_bytes_(magic_bytes),
     protocol_version_(protocol_version),
     default_port_(default_port),
@@ -63,7 +67,11 @@ public:
     block_header_hash_function_(block_header_hash_function),
     block_header_pow_hash_function_(block_header_pow_hash_function),
     genesis_block_(genesis_block),
-    segwit_enabled_(segwit_enabled)
+    segwit_enabled_(segwit_enabled),
+    default_host_(default_host),
+    user_agent_(user_agent),
+    forkHashExists_(forkHashExists),
+    forkHash_(forkHash)
     {
         address_versions_[0] = pay_to_pubkey_hash_version_;
         address_versions_[1] = pay_to_script_hash_version_;
@@ -99,6 +107,11 @@ public:
     const Coin::CoinBlockHeader&    genesis_block() const { return genesis_block_; }
     bool                            segwit_enabled() const { return segwit_enabled_; }
 
+    const char*                     default_host() const { return default_host_; }
+    const std::string&              user_agent() const { return user_agent_; }
+    bool                            forkHashExists() const { return forkHashExists_; }
+    const uchar_vector&             forkHash() const { return forkHash_; }
+
 private:
     uint32_t                magic_bytes_;
     uint32_t                protocol_version_;
@@ -121,6 +134,11 @@ private:
     Coin::hashfunc_t        block_header_pow_hash_function_;
     Coin::CoinBlockHeader   genesis_block_;
     bool                    segwit_enabled_;
+
+    const char*             default_host_;
+    std::string             user_agent_;
+    bool                    forkHashExists_;
+    uchar_vector            forkHash_;
 };
 
 typedef std::pair<std::string, const CoinParams&> NetworkPair;
@@ -148,6 +166,7 @@ private:
 
 // Individual accessors
 const CoinParams& getBitcoinParams();
+const CoinParams& getVitalcoinParams();
 const CoinParams& getTestnet3Params();
 const CoinParams& getLitecoinParams();
 const CoinParams& getLtcTestnet4Params();

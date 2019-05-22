@@ -65,7 +65,7 @@ typedef std::function<void(Peer&, const Coin::Inventory&)>          peer_inv_slo
 class Peer
 {
 public:
-    Peer(io_service_t& io_service, const std::string& host = "", const std::string& port = "", uint32_t magic_bytes = 0, uint32_t protocol_version = 0, const std::string& user_agent = std::string(), uint32_t start_height = 0, bool relay = true, uint32_t invFlags = DEFAULT_INV_FLAGS) :
+    Peer(io_service_t& io_service, const std::string& host = "", const std::string& port = "", uint32_t magic_bytes = 0, uint32_t protocol_version = 0, const std::string& user_agent = std::string(), uint32_t start_height = 0, bool relay = true, uint32_t invFlags = DEFAULT_INV_FLAGS, bool forkHashExists = false, const uchar_vector& forkHash = g_zero32bytes) :
         //io_service_(io_service),
         strand_(io_service),
         resolver_(io_service),
@@ -79,6 +79,8 @@ public:
         start_height_(start_height),
         relay_(relay),
         invFlags_(invFlags),
+        forkHashExists_(forkHashExists),
+        forkHash_(forkHash),
         bRunning(false)
     {
         magic_bytes_vector_ = uint_to_vch(magic_bytes_, LITTLE_ENDIAN_);
@@ -86,7 +88,7 @@ public:
 
     ~Peer() { stop(); }
 
-    void set(const std::string& host, const std::string& port, uint32_t magic_bytes, uint32_t protocol_version, const std::string& user_agent = std::string(), uint32_t start_height = 0, bool relay = true)
+    void set(const std::string& host, const std::string& port, uint32_t magic_bytes, uint32_t protocol_version, const std::string& user_agent = std::string(), uint32_t start_height = 0, bool relay = true, bool forkHashExists = false, const uchar_vector& forkHash = g_zero32bytes)
     {
         stop();
         host_ = host;
@@ -96,6 +98,9 @@ public:
         user_agent_ = user_agent;
         start_height_ = start_height;
         relay_ = relay;
+
+        forkHashExists_ = forkHashExists;
+        forkHash_ = forkHash;
 
         magic_bytes_vector_ = uint_to_vch(magic_bytes_, LITTLE_ENDIAN_);
     }
@@ -313,6 +318,11 @@ private:
 
     // Protocol flags
     uint32_t invFlags_;
+
+
+    // ForkHash handling
+    bool forkHashExists_;
+    uchar_vector forkHash_;
 
     // State members
     boost::shared_mutex mutex;

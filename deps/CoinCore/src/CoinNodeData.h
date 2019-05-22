@@ -92,6 +92,8 @@ enum HashType
 
 typedef std::function<uchar_vector(const uchar_vector&)> hashfunc_t;
 
+void ReportForkHash(bool forkHashExists = false, const uchar_vector& forkHash = g_zero32bytes);
+
 class CoinNodeStructure
 {
 public:
@@ -269,7 +271,9 @@ public:
         uint64_t nonce,
         const char* subVersion,
         int32_t startHeight,
-        bool relay = true
+        bool relay = true,
+        bool forkHashExists = false,
+        const uchar_vector& forkHash = g_zero32bytes
     );
     VersionMessage(const uchar_vector bytes) { this->setSerialized(bytes); }
 
@@ -281,7 +285,10 @@ public:
     uint64_t nonce() const { return nonce_; }
     const VarString& subVersion() const { return subVersion_; }
     int32_t startHeight() const { return startHeight_; }
-    bool relay() const { return relay_; } 
+    bool relay() const { return relay_; }
+
+    bool forkHashExists() const { return forkHashExists_; }
+    const uchar_vector& forkHash() const { return forkHash_; }
 
     const char* getCommand() const { return "version"; }
     uint64_t getSize() const;
@@ -301,6 +308,9 @@ private:
     VarString subVersion_;
     int32_t startHeight_;
     bool relay_;
+
+    bool forkHashExists_;
+    uchar_vector forkHash_;
 };
 
 class BlankMessage : public CoinNodeStructure
@@ -718,6 +728,8 @@ private:
     mutable uchar_vector hashPrevouts;
     mutable uchar_vector hashSequence;
     mutable uchar_vector hashOutputs;
+
+    uchar_vector getSerialized(bool bWithWitness, bool bWithForkHash) const;
 };
 
 class CoinBlock;
