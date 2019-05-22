@@ -2115,7 +2115,7 @@ void MainWindow::errorStatus(const QString& message)
 void MainWindow::processUrl(const QUrl& url)
 {
     try {
-        if (url.scheme().compare("bitcoin:", Qt::CaseInsensitive)) {
+        if (url.scheme().compare("vitalcoin:", Qt::CaseInsensitive)) {
             PaymentRequest paymentRequest(url);
             createTx(paymentRequest);            
         }

@@ -36,7 +36,7 @@
 #include <boost/algorithm/string.hpp>
 
 const std::string COINDB_VERSION = "v0.8.0";
-const std::string DEFAULT_NETWORK = "bitcoin";
+const std::string DEFAULT_NETWORK = "vitalcoin";
 const bool USE_WITNESS_P2SH = true;
 
 using namespace std;
@@ -1307,7 +1307,7 @@ int main(int argc, char* argv[])
         "create",
         "create a new vault",
         command::params(1, "db file"),
-        command::params(1, "network = bitcoin")));
+        command::params(1, "network = vitalcoin")));
     shell.add(command(
         &cmd_info,
         "info",

@@ -53,7 +53,7 @@ typedef std::function<void(const ChainMerkleBlock&, const bytes_t& /*txhash*/ , 
 class NetworkSync
 {
 public:
-    NetworkSync(const CoinQ::CoinParams& coinParams = CoinQ::getBitcoinParams(), bool bCheckProofOfWork = false);
+    NetworkSync(const CoinQ::CoinParams& coinParams = CoinQ::getVitalcoinParams(), bool bCheckProofOfWork = false);
     ~NetworkSync();
 
     void setCoinParams(const CoinQ::CoinParams& coinParams);

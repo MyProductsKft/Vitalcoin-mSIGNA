@@ -24,8 +24,8 @@
 #include <QObject>
 
 // TODO: Allow different coin parameters
-const QString VALID_URL_SCHEME("bitcoin");
-const unsigned char VALID_ADDRESS_VERSIONS[] = { 0x00, 0x05 };
+const QString VALID_URL_SCHEME("vitalcoin");
+const unsigned char VALID_ADDRESS_VERSIONS[] = { 0x23, 0x26 };
 const int VALID_VERSION_COUNT = sizeof(VALID_ADDRESS_VERSIONS)/sizeof(unsigned char);
 const char* BASE58_CHARS = BITCOIN_BASE58_CHARS;
 const unsigned int ADDRESS_DATA_SIZE = 20;
