@@ -165,7 +165,7 @@ const CoinParams vitalcoinParams(
                       /* uchar_vector merkleRoot_           ; */     uchar_vector("4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b")
                                                                  ),
 /* bool                  segwit_enabled_                    ; */ true,
-/* const char*           default_host_                      ; */ "localhost",
+/* const char*           default_host_                      ; */ "Seed.Vitalcoins.io",
 /* std::string           user_agent_                        ; */ std::string("mSIGNA Wallet for Vitalcoin (v0.11.1)"),
 /* bool                  forkHashExists_                    ; */ true,
 /* uchar_vector          forkHash_                          ; */ uchar_vector("179ac1d7e8a5c6f882acf4b86078583b6e2ef5c03d04c36691e5a04ecb8a098e")
