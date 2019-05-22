@@ -25,7 +25,7 @@
 
 const std::string DEFAULT_DATA_DIR = "CoinDB";
 const std::string DEFAULT_CONFIG_FILE = "coindb.conf";
-const std::string DEFAULT_NETWORK_NAME = "vitalcoin";
+const std::string DEFAULT_NETWORK_NAME = "Vitalcoin";
 
 class CoinDBConfig
 {
@@ -66,7 +66,7 @@ inline CoinDBConfig::CoinDBConfig() : m_options("Options")
         ("config", po::value<std::string>(&m_configFile), "name of the configuration file")
         ("dbuser", po::value<std::string>(&m_databaseUser), "database user")
         ("dbpasswd", po::value<std::string>(&m_databasePassword), "database password")
-        ("network", po::value<std::string>(&m_networkName), "network name (default: vitalcoin)")
+        ("network", po::value<std::string>(&m_networkName), "network name (default: Vitalcoin)")
     ;
 }
 

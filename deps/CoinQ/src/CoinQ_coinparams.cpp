@@ -24,32 +24,52 @@ namespace CoinQ
 
 NetworkSelector::NetworkSelector(const std::string& network_name)
 {
-    NetworkMap_Insert(getBitcoinParams    );
-    NetworkMap_Insert(getVitalcoinParams  );
-    NetworkMap_Insert(getTestnet3Params   );
-    NetworkMap_Insert(getLitecoinParams   );
-    NetworkMap_Insert(getLtcTestnet4Params);
-    NetworkMap_Insert(getQuarkcoinParams  );
+    NetworkMap_InsertWithDefault(getBitcoinParams    , ""           );
+    NetworkMap_InsertWithDefault(getVitalcoinParams  , ""           );
+    NetworkMap_InsertWithDefault(getTestnet3Params   , "Testnet3"   );
+    NetworkMap_InsertWithDefault(getLitecoinParams   , ""           );
+    NetworkMap_InsertWithDefault(getLtcTestnet4Params, "LtcTestnet4");
+    NetworkMap_InsertWithDefault(getQuarkcoinParams  , ""           );
 
     if (!network_name.empty()) { select(network_name); }
 }
 
-void NetworkSelector::NetworkMap_Insert(const CoinParams& (*pGetterFunction)())
+void NetworkSelector::NetworkMap_Insert(const CoinParams& (*pGetterFunction)(), const std::string& alternate_name)
 {
     if (!pGetterFunction) return;
 
     const CoinParams& CP = pGetterFunction();
-    string Key(CP.network_name());
+    string Key(alternate_name.empty() ? CP.network_name() : alternate_name);
 
     transform(Key.begin(), Key.end(), Key.begin(), ::tolower);
 
     network_map_.insert(NetworkPair(Key, CP));
 }
 
-vector<string> NetworkSelector::getNetworkNames() const
+void NetworkSelector::NetworkMap_InsertWithDefault(const CoinParams& (*pGetterFunction)(), const std::string& alternate_name)
+{
+    if (!pGetterFunction) return;
+
+    if (!alternate_name.empty()) NetworkMap_Insert(pGetterFunction, alternate_name);
+    NetworkMap_Insert(pGetterFunction, "");
+}
+
+vector<string> NetworkSelector::getNetworkNames(bool bIncludeAliases) const
 {
     vector<string> names;
-    for (const auto& item: network_map_) { names.push_back(item.second.network_name()); }
+
+    for (const auto& item: network_map_)
+    {
+        string Key(item.first);
+        string network_name(item.second.network_name());
+        string lower_network_name(network_name);
+
+        transform(lower_network_name.begin(), lower_network_name.end(), lower_network_name.begin(), ::tolower);
+
+        if (Key == lower_network_name) names.push_back(network_name);
+        else if (bIncludeAliases)      names.push_back(Key         );
+    }
+
     return names;
 }
 
@@ -162,7 +182,7 @@ const CoinParams testnet3Params(
 /* uint8_t               pay_to_witness_pubkey_hash_version_; */ 6,
 /* uint8_t               pay_to_witness_script_hash_version_; */ 40,
 /* uint8_t               privkey_version_                   ; */ 239,
-/* const char*           network_name_                      ; */ "Testnet3",
+/* const char*           network_name_                      ; */ "Bitcoin TestNet3",
 /* const char*           url_prefix_                        ; */ "testnet3",
 /* uint64_t              currency_divisor_                  ; */ 100000000,
 /* const char*           currency_symbol_                   ; */ "tBTC",
@@ -226,7 +246,7 @@ const CoinParams ltcTestnet4Params(
 /* uint8_t               pay_to_witness_pubkey_hash_version_; */ 4,
 /* uint8_t               pay_to_witness_script_hash_version_; */ 10,
 /* uint8_t               privkey_version_                   ; */ 239,
-/* const char*           network_name_                      ; */ "LtcTestnet4",
+/* const char*           network_name_                      ; */ "Litecoin TestNet4",
 /* const char*           url_prefix_                        ; */ "ltctestnet4",
 /* uint64_t              currency_divisor_                  ; */ 100000000,
 /* const char*           currency_symbol_                   ; */ "tLTC",

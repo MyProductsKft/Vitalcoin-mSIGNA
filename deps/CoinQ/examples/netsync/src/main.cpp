@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
         if (argc < 3)
         {
             cerr << "# Usage: " << argv[0] << " <network> <host> [port] [bloom filter elements = 10]" << endl
-                 << "# Supported networks: " << stdutils::delimited_list(networkSelector.getNetworkNames(), ", ") << endl;
+                 << "# Supported networks: " << stdutils::delimited_list(networkSelector.getNetworkNames(true), ", ") << endl;
             return -1;
         }
 

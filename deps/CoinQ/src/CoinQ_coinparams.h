@@ -149,7 +149,7 @@ class NetworkSelector
 public:
     explicit NetworkSelector(const std::string& network_name = "");
 
-    std::vector<std::string> getNetworkNames() const;
+    std::vector<std::string> getNetworkNames(bool bIncludeAliases = false) const;
     const CoinParams& getCoinParams(const std::string& network_name = "") const;
 
     void select(const std::string& network_name);
@@ -160,7 +160,8 @@ private:
     std::string selected_;
     const CoinParams* selectedCP = NULL;
 
-    void NetworkMap_Insert(const CoinParams& (*pGetterFunction)());
+    void NetworkMap_Insert(const CoinParams& (*pGetterFunction)(), const std::string& alternate_name = "");
+    void NetworkMap_InsertWithDefault(const CoinParams& (*pGetterFunction)(), const std::string& alternate_name = "");
 };
 
 

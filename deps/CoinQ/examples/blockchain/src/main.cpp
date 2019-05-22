@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
         if (argc < 3)
         {
             cerr << "# Usage: " << argv[0] << " <network> <host> [start hash] [start height] [port]" << endl
-                 << "# Supported networks: " << stdutils::delimited_list(networkSelector.getNetworkNames(), ", ") << endl;
+                 << "# Supported networks: " << stdutils::delimited_list(networkSelector.getNetworkNames(true), ", ") << endl;
             return -1;
         }
 

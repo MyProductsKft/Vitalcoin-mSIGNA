@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
         {
             cerr << "SyncDB by Eric Lombrozo " << VERSION_INFO << endl
                  << "# Usage: " << argv[0] << " <network> <dbname> <host> [port]" << endl
-                 << "# Supported networks: " << stdutils::delimited_list(networkSelector.getNetworkNames(), ", ") << endl
+                 << "# Supported networks: " << stdutils::delimited_list(networkSelector.getNetworkNames(true), ", ") << endl
                  << "# Use " << argv[0] << " --help for more options." << endl;
             return -1;
         }
